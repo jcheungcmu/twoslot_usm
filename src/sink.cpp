@@ -1,8 +1,6 @@
 #include <sycl/sycl.hpp>
 #include <sycl/ext/intel/fpga_extensions.hpp>
 
-#define PIPELINE_STAGES 1
-
 using namespace sycl;
 using namespace std;
 
@@ -37,12 +35,10 @@ extern "C" {
         // the hosts address space
         sycl::ext::intel::host_ptr<block512> out(out_ptr);
 
-        // block512 regs[PIPELINE_STAGES];
         block1056 packet;
         block512 data;
 
         [[intel::initiation_interval(1)]]
-        // for (size_t i = 0; i < count + PIPELINE_STAGES; i++) {
         for (size_t i = 0; i < count; i++) {
           // do a simple copy - more complex computation can go here
           packet = read_iopipe::read(); 
@@ -52,20 +48,6 @@ extern "C" {
           }
           *(out + i) = data;
 
-          // if (i < count) {
-          //   packet = read_iopipe::read();
-          // }
-
-          // if (i >= PIPELINE_STAGES) {
-          //   *(out + i - PIPELINE_STAGES) = regs[PIPELINE_STAGES - 1];
-          // }
-
-          // #pragma unroll
-          // for (uint16_t stage = PIPELINE_STAGES-1; stage > 0; stage--) {
-          //   regs[stage] = regs[stage - 1];
-          // }
-
-          // regs[0] = packet.data;
         
         }
       });

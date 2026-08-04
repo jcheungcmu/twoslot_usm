@@ -1,8 +1,6 @@
 #include <sycl/sycl.hpp>
 #include <sycl/ext/intel/fpga_extensions.hpp>
 
-#define PIPELINE_STAGES 1
-
 using namespace sycl;
 using namespace std;
 
@@ -43,7 +41,6 @@ extern "C" {
         packet.dest_addr = dest_addr;
 
         [[intel::initiation_interval(1)]]
-        // for (size_t i = 0; i < count + PIPELINE_STAGES; i++) {
         for (size_t i = 0; i < count; i++) {
           // do a simple copy - more complex computation can go here
           data = *(in + i);
@@ -52,24 +49,6 @@ extern "C" {
             packet.data[j] = data.a[j];
           }
           write_iopipe::write(packet);
-
-          // if (i < count) {
-          //   data = *(in + i);
-          // }
-
-          // if (i >= PIPELINE_STAGES) {
-          //   write_iopipe::write(regs[PIPELINE_STAGES - 1]);
-          // }
-
-          // #pragma unroll
-          // for (uint16_t stage = PIPELINE_STAGES-1; stage > 0; stage--) {
-          //   regs[stage] = regs[stage - 1];
-          // }
-
-          // regs[0].data = data;
-          // regs[0].dest_addr = dest_addr;
-
-
 
         }
       });
